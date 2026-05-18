@@ -30,4 +30,4 @@ ALTITUDE_HAP = 20000   # 20 km
 
 # Network Scale
 NUM_BS = 7             # Number of ground base stations 
-AREA_SQ_KM = 10        # Total network service area  
+AREA_SQ_KM = 100        # Total network service area  
