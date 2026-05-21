@@ -1,33 +1,33 @@
-# Table I: Simulation Parameters 
+# Table I : Simulation parameters
 
-# Backhaul error probability (epsilon_b)
-BACKHAUL_ERROR_PROB = 1e-6 
+# Backhaul error probability 
+BACKHAUL_ERROR_PROB = 1e-6
 
-# Reliability threshold (1 - epsilon_th)
+# Reliaility threshold
 RELIABILITY_THRESHOLD = 0.99999
 
 # Latency threshold 
-LATENCY_THRESHOLD_S = 0.03
+LATENCY_THRESHOLD = 0.030
 
-# Noise spectral density (N0) in dBm
-NOISE_DENSITY_DBM = -174 
 
-# Carrier frequency (fc) in GHz
-CARRIER_FREQ_GHZ = 2 
+# Noise spectral density in dBm
+NOISE_SPECTRAL_DENSITY_DBM = -174
 
-# Bandwidth in Hz (10-15 MHz)
-BANDWIDTH_HZ = 10e6 
+# Carrier frequency in GHz
+CARRIER_FREQ_GHZ = 2
 
-# Transmit Powers in dBm
-TX_POWER_AV = 23
-TX_POWER_GBS_HAP = 46
-TX_POWER_LEO = 50 
+# Bandwidth (10-15 MHz)
+BANDWIDTH_HZ = 10e6
 
-# Topology Parameters
-# Altitudes in meters
-ALTITUDE_LEO = 110000  # 110 km 
-ALTITUDE_HAP = 20000   # 20 km 
+# Transmit power in dBm
+TX_POWER_AV = 23        # Aerial vehicle Tx power
+TX_POWER_GBS_HAP = 46   # Ground base station / HAP Tx power
+TX_POWER_LEO = 50       # LEO satellite Tx power
 
-# Network Scale
-NUM_BS = 7             # Number of ground base stations 
-AREA_SQ_KM = 100        # Total network service area  
+
+# Network toplogy parameters
+NUM_GBS = 7             # Number of ground base stations
+AREA_SQ_KM = 100        # Total network service area in square kilometers
+
+ALTITUDE_HAP = 20000    # 20 Km
+ALTITUDE_LEO = 110000   # 110 Km

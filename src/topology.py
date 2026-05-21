@@ -72,3 +72,4 @@ if __name__ == "__main__":
     ax.set_title('NTN-ORAN Topology')
     ax.legend()
     plt.show()
+    

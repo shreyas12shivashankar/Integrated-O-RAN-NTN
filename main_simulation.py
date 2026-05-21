@@ -3,12 +3,13 @@ import pandas as pd
 import src.constants as const
 from src.topology import get_hexagonal_bs, get_random_users, get_ntn_nodes
 from src.system_model import (
-    calculate_3D_distance, 
-    calculate_path_loss, 
-    calculate_free_space_path_loss,
-    calculate_sinr,
-    calculate_rate,
-    calculate_channel_coefficient
+    distance_3D, 
+    path_loss, 
+    free_space_path_loss,
+    channel_coefficient,
+    sinr,
+    rate,
+    error_probability    
 )
 
 def run_downlink_simulation():
@@ -35,8 +36,8 @@ def run_downlink_simulation():
 
         # --- A. Check all Terrestrial Base Stations (BS) ---
         for bs_id, bs_pos in enumerate(bs_coords):
-            dist = calculate_3D_distance(bs_pos, ue_pos)
-            pl_db = calculate_path_loss(dist, const.CARRIER_FREQ_GHZ)
+            dist = distance_3D(bs_pos, ue_pos)
+            pl_db = path_loss(dist, const.CARRIER_FREQ_GHZ)
             rx_power_dbm = const.TX_POWER_GBS_HAP - pl_db
             
             # Convert Rx power to linear Watts for potential interference math later
@@ -51,8 +52,8 @@ def run_downlink_simulation():
                 best_path_loss = pl_db
 
         # --- B. Check HAP ---
-        dist_hap = calculate_3D_distance(hap_coord, ue_pos)
-        pl_hap_db = calculate_free_space_path_loss(dist_hap, const.CARRIER_FREQ_GHZ)
+        dist_hap = distance_3D(hap_coord, ue_pos)
+        pl_hap_db = free_space_path_loss(dist_hap, const.CARRIER_FREQ_GHZ)
         rx_power_hap_dbm = const.TX_POWER_GBS_HAP - pl_hap_db
         
         if rx_power_hap_dbm > max_rx_power_dbm:
@@ -63,8 +64,8 @@ def run_downlink_simulation():
             best_path_loss = pl_hap_db
 
         # --- C. Check LEO ---
-        dist_leo = calculate_3D_distance(leo_coord, ue_pos)
-        pl_leo_db = calculate_free_space_path_loss(dist_leo, const.CARRIER_FREQ_GHZ)
+        dist_leo = distance_3D(leo_coord, ue_pos)
+        pl_leo_db = free_space_path_loss(dist_leo, const.CARRIER_FREQ_GHZ)
         rx_power_leo_dbm = const.TX_POWER_LEO - pl_leo_db
         
         if rx_power_leo_dbm > max_rx_power_dbm:
@@ -77,7 +78,7 @@ def run_downlink_simulation():
         # --- 3. Calculate SINR and Rate for the Best Connection ---
         # The paper assumes g_jn (antenna gain) is 1 for simplicity in basic setup, 
         # and we need the Rician factor K. Let's assume K=10 for line of sight.
-        h_coef = calculate_channel_coefficient(antenna_gain=1.0, path_loss_db=best_path_loss, rician_factor_k=10)
+        h_coef = channel_coefficient(antenna_gain = 1.0, path_loss_db = best_path_loss, rician_factor_k = 10)
         h_sq = np.abs(h_coef)**2
         
         # Convert Tx power of the best node to Watts
@@ -95,12 +96,12 @@ def run_downlink_simulation():
             interference_watts = 0.0 
 
         # Calculate Noise density in Watts/Hz
-        noise_density_watts = 10 ** ((const.NOISE_DENSITY_DBM - 30) / 10)
+        noise_density_watts = 10 ** ((const.NOISE_SPECTRAL_DENSITY_DBM - 30) / 10)
         
         # Final SINR and Rate
-        sinr_linear = calculate_sinr(p_watts, h_sq, interference_watts, noise_density_watts, const.BANDWIDTH_HZ)
+        sinr_linear = sinr(p_watts, h_sq, interference_watts, noise_density_watts, const.BANDWIDTH_HZ)
         sinr_db = 10 * np.log10(sinr_linear) if sinr_linear > 0 else 0
-        rate_bps = calculate_rate(const.BANDWIDTH_HZ, sinr_linear)
+        rate_bps = rate(const.BANDWIDTH_HZ, sinr_linear)
 
         # 4. Save results for this UE
         simulation_results.append({
@@ -116,7 +117,7 @@ def run_downlink_simulation():
     # Convert to Pandas DataFrame for a beautiful printed table
     df_results = pd.DataFrame(simulation_results)
     
-    print("\n--- Downlink Simulation Results (First 15 UEs) ---")
+    print("\n--- Downlink Simulation Results ---")
     print(df_results.to_string(index=False))
     
     # Print a quick summary of how many UEs connected to each node type
